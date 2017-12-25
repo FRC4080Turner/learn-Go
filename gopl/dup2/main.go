@@ -11,17 +11,17 @@ import (
 func main() {
 	counts := make(map[string]int) // make a map with strings as keys that link int values
 	files := os.Args[1:]           // get all args, assume they are file paths
-	if len(files) == 0 {
+	if len(files) == 0 {           // use stdin if no files were given as args
 		countLines(os.Stdin, counts)
 	} else {
 		for _, arg := range files {
-			f, err := os.Open(arg)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "dup2: %v\n", err)
+			file, error := os.Open(arg) // get the error and file content from the list of args (files)
+			if error != nil {
+				fmt.Fprintf(os.Stderr, "dup2: %v\n", error)
 				continue
 			}
-			countLines(f, counts)
-			f.Close()
+			countLines(file, counts)
+			file.Close()
 		}
 	}
 	// ignore potential errors from input.Err()
@@ -32,7 +32,7 @@ func main() {
 	}
 }
 
-func countLines(f *os.File, counts map[string]int) {
+func countLines(f *os.File, counts map[string]int) { // the same map made in main is passed in and edited
 	input := bufio.NewScanner(f)
 	for input.Scan() {
 		counts[input.Text()]++
